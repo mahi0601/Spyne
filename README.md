@@ -119,6 +119,39 @@ curl -X GET http://localhost:5000/api/status/12345-abcdef
 |-----------|-------------|------------------|------------------|
 | 1 | SKU1 | input1.jpg, input2.jpg | output1.jpg, output2.jpg |
 
+# 📌 Low-Level Design (LLD) - Spyne Image Processing API
+
+## **🖥️ System Architecture Diagram**
+Below is the **LLD diagram** representing the flow of the Spyne Image Processing API:
+
+```mermaid
+graph TD;
+    A[User Uploads CSV File] -->|POST /api/upload| B(API Gateway - Express.js);
+    B -->|Validates CSV| C[Upload Service];
+    C -->|Stores in DB| D[MongoDB Database];
+    D -->|Triggers Job| E[Image Processing Worker - Bull Queue];
+    E -->|Fetches Images & Compresses| F[Sharp Image Processing];
+    F -->|Updates DB| D;
+    D -->|Status Check| G[GET /api/status/:requestId];
+    E -->|Triggers Webhook| H[Webhook Notification];
+    D -->|Generates CSV Output| I[Final Processed CSV];
+    I -->|User Downloads CSV| J[GET /api/output/:requestId];
+
+    subgraph Database
+      D[MongoDB Database]
+    end
+
+    subgraph Backend Services
+      B --> C;
+      C --> D;
+      D --> E;
+      E --> F;
+      F --> D;
+    end
+
+```
+
+
 ## 📜 Swagger API Docs
 Access Swagger documentation at:
 ```
