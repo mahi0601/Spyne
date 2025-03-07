@@ -1,0 +1,3 @@
+Serial Number,Product Name,Input Image Urls,Output Image Urls
+1,SKU1,"https://input1.jpg, https://input2.jpg","https://output1.jpg, https://output2.jpg"
+2,SKU2,"https://input3.jpg, https://input4.jpg","https://output3.jpg, https://output4.jpg"
