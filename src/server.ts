@@ -15,6 +15,9 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/status", statusRoutes);
 app.use(errorHandler);
 
+app.get("/", (_req, res) => {
+    res.status(200).json({ message: "Welcome to the Spyne Image Processing API!" });
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
