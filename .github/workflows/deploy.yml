@@ -1,0 +1,8 @@
+- name: Install Dependencies
+  run: npm install
+
+- name: Fix File Permissions
+  run: chmod +x node_modules/.bin/tsc
+
+- name: Build TypeScript
+  run: npm run build

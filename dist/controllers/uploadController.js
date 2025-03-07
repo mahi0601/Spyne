@@ -13,27 +13,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadCSV = void 0;
-const multer_1 = __importDefault(require("multer"));
 const uuid_1 = require("uuid");
-const ProcessingRequest_1 = __importDefault(require("../models/ProcessingRequest")); // Import the MongoDB model
-const upload = (0, multer_1.default)({ dest: "uploads/" });
+const ProcessingRequest_1 = __importDefault(require("../models/ProcessingRequest"));
+const bull_1 = __importDefault(require("bull"));
+const imageQueue = new bull_1.default('image-processing');
 const uploadCSV = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.file) {
+            console.error("❌ No file uploaded");
             return res.status(400).json({ message: "No file uploaded" });
         }
-        const requestId = (0, uuid_1.v4)(); // Generate a unique request ID
-        // Store request ID and initial status in MongoDB
+        const requestId = (0, uuid_1.v4)();
         yield ProcessingRequest_1.default.create({ requestId, status: "processing" });
-        // Process the CSV asynchronously (mocked here for simplicity)
-        setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield ProcessingRequest_1.default.findOneAndUpdate({ requestId }, { status: "completed" });
-        }), 5000); // Simulate async processing
-        res.status(200).json({ requestId, message: "CSV uploaded, processing started." });
+        imageQueue.add({ requestId, filePath: req.file.path });
+        console.log(`✅ File uploaded successfully. Request ID: ${requestId}`);
+        return res.status(200).json({ requestId, message: "File uploaded successfully" });
     }
     catch (error) {
-        console.error("Upload error:", error);
-        res.status(500).json({ message: "Error processing file" });
+        console.error("🔥 Error in uploadCSV:", error);
+        return res.status(500).json({ message: "Internal Server Error", error });
     }
 });
 exports.uploadCSV = uploadCSV;

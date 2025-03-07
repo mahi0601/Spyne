@@ -16,7 +16,7 @@ exports.triggerWebhook = void 0;
 const axios_1 = __importDefault(require("axios"));
 const logger_1 = __importDefault(require("../utils/logger"));
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config(); // Load environment variables
+dotenv_1.default.config();
 const WEBHOOK_URL = process.env.WEBHOOK_URL || "";
 const triggerWebhook = (requestId, status) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -25,7 +25,6 @@ const triggerWebhook = (requestId, status) => __awaiter(void 0, void 0, void 0, 
         return;
     }
     const payload = { requestId, status };
-    // Retry mechanism - attempts 3 times if webhook fails
     for (let attempt = 1; attempt <= 3; attempt++) {
         try {
             const response = yield axios_1.default.post(WEBHOOK_URL, payload, {

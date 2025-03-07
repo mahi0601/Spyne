@@ -12,21 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStatus = void 0;
-const ProcessingRequest_1 = __importDefault(require("../models/ProcessingRequest"));
-const getStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { requestId } = req.params;
-        const request = yield ProcessingRequest_1.default.findOne({ requestId });
-        if (!request) {
-            return res.status(404).json({ message: "Request ID not found" });
-        }
-        res.json({ requestId, status: request.status });
-    }
-    catch (error) {
-        console.error("Status check error:", error);
-        res.status(500).json({ message: "Error retrieving status" });
-    }
+exports.generateOutputCSV = void 0;
+const fs_1 = __importDefault(require("fs"));
+const json2csv_1 = require("json2csv");
+const generateOutputCSV = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    const csv = (0, json2csv_1.parse)(data, { fields: ["serialNumber", "productName", "inputImageUrls", "outputImageUrls"] });
+    fs_1.default.writeFileSync("output.csv", csv);
+    console.log("✅ Output CSV Generated: output.csv");
 });
-exports.getStatus = getStatus;
-//# sourceMappingURL=statusController.js.map
+exports.generateOutputCSV = generateOutputCSV;
+//# sourceMappingURL=csvGenerator.js.map

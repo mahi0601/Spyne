@@ -15,10 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/spyne_assignment";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://bipasha:bipasha@school-management.qzifp.mongodb.net/?retryWrites=true&w=majority&appName=school-management";
+;
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect(MONGO_URI, {});
+        yield mongoose_1.default.connect(MONGO_URI);
         console.log("✅ MongoDB Connected");
     }
     catch (error) {

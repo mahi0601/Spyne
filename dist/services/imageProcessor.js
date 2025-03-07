@@ -8,22 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processAndQueueImages = void 0;
-const imageUtils_1 = require("../utils/imageUtils"); // Import from new file
-const queueWorker_1 = require("./queueWorker");
-// Function to process and compress images before adding them to queue
-const processAndQueueImages = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const requestId = Date.now().toString();
+const queueWorker_1 = __importDefault(require("../services/queueWorker"));
+const processAndQueueImages = (requestId, filePath) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Process images before adding them to queue
-        const processedImages = yield Promise.all(data.map(imageUtils_1.compressImage));
-        // Add processed images to queue
-        yield (0, queueWorker_1.addJobToQueue)(requestId, processedImages);
-        return requestId;
+        yield queueWorker_1.default.add({ requestId, filePath });
+        console.log(`Queued image processing for ${requestId}`);
     }
     catch (error) {
-        console.error("Error processing images before adding to queue:", error);
+        console.error('Error adding image processing job:', error);
         throw error;
     }
 });

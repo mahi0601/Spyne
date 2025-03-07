@@ -12,26 +12,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const sharp_1 = __importDefault(require("sharp"));
 const bull_1 = __importDefault(require("bull"));
-const imageUtils_1 = require("../utils/imageUtils");
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const imageQueue = new bull_1.default('image-processing');
+const ProcessingRequest_1 = __importDefault(require("../models/ProcessingRequest"));
+const axios_1 = __importDefault(require("axios"));
+const imageQueue = new bull_1.default("image-processing");
+const processImage = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+    const outputFilePath = filePath.replace(".jpg", "-compressed.jpg");
+    yield (0, sharp_1.default)(filePath)
+        .resize({ width: 800 })
+        .jpeg({ quality: 50 })
+        .toFile(outputFilePath);
+    return outputFilePath;
+});
 imageQueue.process((job, done) => __awaiter(void 0, void 0, void 0, function* () {
+    const { requestId, filePath } = job.data;
     try {
-        const { requestId, filePath } = job.data;
-        const outputDir = 'compressed_images';
-        if (!fs_1.default.existsSync(outputDir))
-            fs_1.default.mkdirSync(outputDir);
-        const outputPath = path_1.default.join(outputDir, `${requestId}.jpg`);
-        yield (0, imageUtils_1.compressImage)(filePath, outputPath);
-        console.log(`Image processed for request ${requestId}`);
+        const outputPath = yield processImage(filePath);
+        yield ProcessingRequest_1.default.findOneAndUpdate({ requestId }, { status: "completed", outputPath });
+        yield axios_1.default.post("https://your-webhook-url.com", {
+            requestId,
+            status: "completed",
+            outputImage: outputPath,
+        });
+        console.log(`✅ Image processed for Request ID: ${requestId}`);
         done();
     }
     catch (error) {
-        console.error('Error processing image:', error);
+        console.error("❌ Error processing image:", error);
         done(error instanceof Error ? error : new Error(String(error)));
     }
 }));
 exports.default = imageQueue;
-//# sourceMappingURL=queueWorker.js.map
+//# sourceMappingURL=imageProcessor.js.map
