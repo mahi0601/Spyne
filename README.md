@@ -114,10 +114,38 @@ curl -X GET http://localhost:5000/api/status/12345-abcdef
 ```
 
 ### **3️⃣ Download Output CSV**
-**Output CSV Format:**
-| Serial No | Product Name | Input Image URLs | Output Image URLs |
-|-----------|-------------|------------------|------------------|
-| 1 | SKU1 | input1.jpg, input2.jpg | output1.jpg, output2.jpg |
+**Endpoint:** `GET /api/output/:requestId`
+```bash
+curl -X GET http://localhost:5000/api/output/12345-abcdef
+```
+#### ✅ Response
+Downloads the processed CSV file.
+
+### **4️⃣ Webhook Integration**
+**Endpoint:** `POST /api/webhook`
+```bash
+curl -X POST http://localhost:5000/api/webhook \
+     -H "Content-Type: application/json" \
+     -d '{"requestId": "12345-abcdef", "status": "completed", "outputImages": ["output1.jpg", "output2.jpg"]}'
+```
+#### ✅ Response
+```json
+{
+  "message": "Webhook received successfully"
+}
+```
+
+### **5️⃣ Health Check API**
+**Endpoint:** `GET /api/health`
+```bash
+curl -X GET http://localhost:5000/api/health
+```
+#### ✅ Response
+```json
+{
+  "status": "API is running"
+}
+```
 
 # 📌 Low-Level Design (LLD) - Spyne Image Processing API
 
@@ -148,9 +176,7 @@ graph TD;
       E --> F;
       F --> D;
     end
-
 ```
-
 
 ## 📜 Swagger API Docs
 Access Swagger documentation at:
@@ -177,6 +203,4 @@ http://localhost:5000/api-docs
 
 ## 🎯 License
 MIT License. Free to use and modify.
-
-
 
